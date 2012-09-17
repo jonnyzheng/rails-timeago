@@ -49,10 +49,22 @@ module Rails
       end
 
       def timeago_tag_content(time, time_options = {}) # :nodoc:
+        in_limit = time > time_options[:limit] 
         time = time.to_date            if time_options[:date_only]
-        return time_ago_in_words(time) if time_options[:nojs]
+        return customize_time_ago_in_words(in_limit,time,time_options) if time_options[:nojs]
 
         I18n.l time, :format => time_options[:format]
+      end
+
+      def customize_time_ago_in_words(in_limit,time,time_options)
+
+        if in_limit
+          time_str = time_ago_in_words(time)
+          time_str + I18n.t('timeago.suffixAgo')
+        else
+          time_str = I18n.l time, :format => time_options[:format]
+        end
+        time_str
       end
 
       # Return a JavaScript tag to include jQuery timeago
